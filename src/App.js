@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import patientData from './patient_data.json';
+import { getSummaryFromChatGPT } from '././AppBackend';
 import './App.css';
 
 function App() {
@@ -7,16 +8,35 @@ function App() {
   const dates = Object.keys(bloodPanelResults);
   const sortedDates = dates.sort((a, b) => b.localeCompare(a));
   const [selectedDate, setSelectedDate] = useState(sortedDates[0]);
+  const [summary, setSummary] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const selectedPanel = bloodPanelResults[selectedDate];
+  const { ...measurements } = selectedPanel;
+
+  const [question, setQuestion] = useState('');
+  const [questionsList, setQuestionsList] = useState([]);
+
+  const fetchSummary = useCallback(async () => {
+    setLoading(true);
+    try {
+      const newSummary = await getSummaryFromChatGPT(selectedDate);
+      setSummary(newSummary || 'Unable to generate summary.');
+    } catch (error) {
+      console.error("Error fetching summary:", error);
+      setSummary('Error: ' + (error.response?.data?.error?.message || error.message || 'Unable to generate summary.'));
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
   };
-
-  const selectedPanel = bloodPanelResults[selectedDate];
-  const { Summary, ...measurements } = selectedPanel;
-
-  const [question, setQuestion] = useState('');
-  const [questionsList, setQuestionsList] = useState([]);
 
   const handleQuestionChange = (event) => {
     setQuestion(event.target.value);
@@ -27,7 +47,7 @@ function App() {
     if (question.trim() !== '') {
       setQuestionsList([...questionsList, question]);
       setQuestion('');
-      // TODO: Send the question to your API here
+      // TODO: Handle the question submission (e.g., send to an API)
     }
   };
 
@@ -72,7 +92,9 @@ function App() {
           </div>
           <div className="summary-container">
             <h2>AI Summary</h2>
-            <div className="summary-text">{Summary}</div>
+            <div className="summary-text">
+              {loading ? 'Loading summary...' : summary}
+            </div>
             <h3>Ask a question about your results:</h3>
             <form onSubmit={handleQuestionSubmit}>
               <textarea

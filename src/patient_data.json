@@ -21,8 +21,7 @@
             "Platelets": [
                 158.0,
                 "thousand cells/mcL"
-            ],
-            "Summary": "Hi, John! Most of your results look great! However, your low WBC is something to investigate. Have you felt sick at all lately? If so, it may be wise to have another panel done once you feel better. Low WBC can be linked to a temporary illness."
+            ]
         },
         "2024-08-31": {
             "Red Blood Cells (RBC)": [
@@ -44,8 +43,7 @@
             "Platelets": [
                 434.0,
                 "thousand cells/mcL"
-            ],
-            "Summary": "Most of your results look great! However, your low WBC is something to investigate. Have you felt sick at all lately? If so, it may be wise to have another panel done once you feel better. Low WBC can be linked to a temporary illness."
+            ]
         }
     }
 }
